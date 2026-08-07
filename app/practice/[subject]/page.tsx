@@ -16,7 +16,8 @@ interface Question {
 
 export default function PracticeExamPage() {
   const params = useParams();
-  
+  const supabase = createClient();
+
   // Clean raw subject string
   const rawSubject = (params.subject as string || "english").toLowerCase().trim();
   
@@ -30,13 +31,12 @@ export default function PracticeExamPage() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [score, setScore] = useState(0);
   const [completed, setCompleted] = useState(false);
-
-  const supabase = createClient();
+  const [savingScore, setSavingScore] = useState(false);
 
   useEffect(() => {
     async function fetchQuestions() {
       setLoading(true);
-      
+
       const { data, error } = await supabase
         .from("questions")
         .select("*")
@@ -67,15 +67,46 @@ export default function PracticeExamPage() {
     setShowExplanation(true);
   };
 
-  const handleNextQuestion = () => {
-    if (currentIndex + 1 < questions.length) {
-      setCurrentIndex((prev) => prev + 1);
-      setSelectedOption(null);
-      setShowExplanation(false);
-    } else {
-      setCompleted(true);
+  // Function to save user score to Supabase
+  const saveScoreToDatabase = async (finalScore: number) => {
+    setSavingScore(true);
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      console.warn("User not logged in. Score was not saved.");
+      setSavingScore(false);
+      return;
     }
+
+    const percentage = Math.round((finalScore / questions.length) * 100);
+
+    const { error } = await supabase.from("user_scores").insert([
+      {
+        user_id: user.id,
+        subject: rawSubject,
+        score: finalScore,
+        total_questions: questions.length,
+        percentage: percentage,
+      },
+    ]);
+
+    if (error) {
+      console.error("Failed to save score:", error.message);
+    } else {
+      console.log("🎉 Score successfully saved to Supabase!");
+    }
+    setSavingScore(false);
   };
+
+  const handleNextQuestion = () => {
+  if (currentIndex + 1 < questions.length) {
+    setCurrentIndex((prev) => prev + 1);
+    setSelectedOption(null);
+    setShowExplanation(false);
+  } else {
+    setCompleted(true); // 👈 Missing saveScoreToDatabase(score) call!
+  }
+};
 
   if (loading) {
     return (
@@ -117,20 +148,25 @@ export default function PracticeExamPage() {
             <div className="text-5xl mb-4">🏆</div>
             <h2 className="text-2xl font-black mb-2">Exam Completed!</h2>
             <p className="text-slate-400 text-sm mb-6">Here is your final score:</p>
-            <div className="text-4xl font-extrabold text-blue-400 mb-6">
+            <div className="text-4xl font-extrabold text-blue-400 mb-4">
               {score} / {questions.length}
             </div>
+            {savingScore ? (
+              <p className="text-xs text-slate-400 mb-6 animate-pulse">Saving score to your account...</p>
+            ) : (
+              <p className="text-xs text-emerald-400 font-semibold mb-6">✓ Score recorded successfully</p>
+            )}
             <Link
               href="/"
               className="inline-block w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition"
             >
-              Back to Home
+              Back to Dashboard
             </Link>
           </div>
         ) : (
           /* Active Question Interface */
           <div>
-            {/* Progress */}
+            {/* Progress Bar */}
             <div className="flex justify-between items-center text-xs font-semibold text-slate-400 mb-3">
               <span>Question {currentIndex + 1} of {questions.length}</span>
               <span>Score: {score}</span>
