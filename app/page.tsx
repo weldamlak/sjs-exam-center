@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import LogoutButton from "@/components/LogoutButton"; // Move import to top
 
 // --- Types ---
 interface Subject {
@@ -106,18 +107,21 @@ export default function Home() {
             </span>
           </div>
 
-          {/* Stream Navigation */}
-          <nav className="flex gap-6 text-sm font-medium text-slate-300">
-            <a href="#natural-science" className="hover:text-blue-400 transition">
-              Natural Science
-            </a>
-            <a href="#social-science" className="hover:text-indigo-400 transition">
-              Social Science
-            </a>
-          </nav>
-        </div>
+          {/* Stream Navigation & Logout Button */}
+          <div className="flex items-center gap-6">
+            <nav className="hidden sm:flex gap-6 text-sm font-medium text-slate-300">
+              <a href="#natural-science" className="hover:text-blue-400 transition">
+                Natural Science
+              </a>
+              <a href="#social-science" className="hover:text-indigo-400 transition">
+                Social Science
+              </a>
+            </nav>
+            {/* Render Log Out component here */}
+            <LogoutButton />
+          </div>
 
-        import LogoutButton from "@/components/LogoutButton";
+        </div>
       </header>
 
       {/* Main Hero & Subjects Section */}
