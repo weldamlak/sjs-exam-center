@@ -116,6 +116,8 @@ export default function Home() {
             </a>
           </nav>
         </div>
+
+        import LogoutButton from "@/components/LogoutButton";
       </header>
 
       {/* Main Hero & Subjects Section */}
