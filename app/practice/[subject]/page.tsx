@@ -16,8 +16,11 @@ interface Question {
 
 export default function PracticeExamPage() {
   const params = useParams();
-  const rawSubject = (params.subject as string) || "english";
-  // Normalize subject slug (e.g. english-social -> english)
+  
+  // Clean raw subject string
+  const rawSubject = (params.subject as string || "english").toLowerCase().trim();
+  
+  // Normalize subject slug
   const subjectSlug = rawSubject.startsWith("english") ? "english" : rawSubject;
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -33,14 +36,16 @@ export default function PracticeExamPage() {
   useEffect(() => {
     async function fetchQuestions() {
       setLoading(true);
+      
       const { data, error } = await supabase
         .from("questions")
         .select("*")
         .eq("subject", subjectSlug);
 
       if (error) {
-        console.error("Error fetching questions:", error);
+        console.error("Error fetching questions:", error.message);
       } else if (data) {
+        console.log(`Fetched ${data.length} questions for subject: "${subjectSlug}"`);
         setQuestions(data);
       }
       setLoading(false);
