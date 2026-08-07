@@ -98,13 +98,17 @@ export default function PracticeExamPage() {
     setSavingScore(false);
   };
 
-  const handleNextQuestion = () => {
+ const handleNextQuestion = async () => {
+  console.log("➡️ Next / Finish button clicked!"); // Debug log
+
   if (currentIndex + 1 < questions.length) {
     setCurrentIndex((prev) => prev + 1);
     setSelectedOption(null);
     setShowExplanation(false);
   } else {
-    setCompleted(true); // 👈 Missing saveScoreToDatabase(score) call!
+    setCompleted(true);
+    console.log("🏁 Exam finished! Saving score to database...");
+    await saveScoreToDatabase(score);
   }
 };
 
