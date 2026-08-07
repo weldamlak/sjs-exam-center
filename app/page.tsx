@@ -6,7 +6,7 @@ interface Subject {
   name: string;
   slug: string;
   description: string;
-  icon: (props: { className?: string }) => JSX.Element;
+  icon: (props: { className?: string }) => React.ReactNode;
 }
 
 // --- Lightweight SVG Icons ---
