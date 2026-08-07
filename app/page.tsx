@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import LogoutButton from "@/components/LogoutButton"; // Move import to top
+import RecentScores from "@/components/RecentScores";
 
 // --- Types ---
 interface Subject {
@@ -137,6 +138,12 @@ export default function Home() {
             Select your academic stream below to begin taking structured practice exams.
           </p>
         </div>
+
+
+<section className="mb-12">
+  <RecentScores />
+</section>
+
 
         {/* --- Natural Science Stream --- */}
         <section id="natural-science" className="mb-16 scroll-mt-24">
